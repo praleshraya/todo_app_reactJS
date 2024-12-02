@@ -4,19 +4,34 @@ import './App.css';
 const App = () => {
     const [task, setTask] = useState('');
     const [tasks, setTasks] = useState([]);
+    const [editIndex, setEditIndex] = useState(null); // Track which task is being edited
+
 
     // Add Task
     const addTask = () => {
         if (task.trim() !== '') {
-            setTasks([...tasks, task]);
+            if (editIndex === null) {
+                setTasks([...tasks, task]);
+            } else {
+                const updatedTasks = tasks.map((t, index) =>
+                    index === editIndex ? task : t
+                );
+                setTasks(updatedTasks);
+                setEditIndex(null); // Reset edit mode
+            }
             setTask(''); // Clear input field
         }
     };
-
     // Delete Task
     const deleteTask = (index) => {
         const updatedTasks = tasks.filter((_, i) => i !== index);
         setTasks(updatedTasks);
+    };
+
+     // Edit Task
+     const editTask = (index) => {
+        setTask(tasks[index]); // Set the task value to be edited
+        setEditIndex(index);    // Set the task index being edited
     };
 
     // Download Tasks
@@ -71,6 +86,7 @@ const App = () => {
                 {tasks.map((t, index) => (
                     <li key={index} className="task-item">
                         {t}
+                        <button onClick={() => editTask(index)}>Edit Task</button>
                         <button onClick={() => deleteTask(index)}>Delete Task</button>
                     </li>
                 ))}
@@ -78,7 +94,7 @@ const App = () => {
 
             {/* Download and Upload Buttons */}
             <div>
-                <button onClick={downloadTasks}>Download Tasks</button>
+                <button onClick={downloadTasks} className='dwnbtn'>Download Tasks</button>
                 <input type="file" accept="application/json" onChange={uploadTasks} />
             </div>
         </div>
